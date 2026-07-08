@@ -1,0 +1,47 @@
+# ===== 공통 설정 (환경 무관) =====
+# DB 접속정보는 여기에 두지 않는다. 반드시 dev 또는 prod 프로파일을 지정해서 실행한다.
+#   - 프로파일 미지정 시 datasource 가 없어 기동 실패 (의도적 — 환경 혼선 방지)
+#   - 로컬: --spring.profiles.active=dev  /  배포: SPRING_PROFILES_ACTIVE=prod
+spring:
+  application:
+    name: hyu-batch
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: public
+        jdbc:
+          batch_size: 1000
+        order_inserts: true
+        order_updates: true
+
+  # Spring Batch 5 설정
+  batch:
+    job:
+      enabled: false          # 부팅 시 Job 자동 실행 방지 (스케줄러/REST 로 수동 트리거)
+    jdbc:
+      initialize-schema: never
+      table-prefix: scop.BATCH_   # 메타 테이블을 scop 스키마에서 관리
+
+server:
+  port: ${SERVER_PORT:8082}
+  servlet:
+    context-path: /batch
+
+# 생산성 데이터 전송 대상 외부 API (미설정 시 전송 단계 skip)
+api:
+  productivity:
+    url: ${PRODUCTIVITY_API_URL:}
+
+logging:
+  level:
+    com.sph.hyu.batch: INFO
+    org.springframework.web: INFO
+  config: classpath:logback-spring.xml

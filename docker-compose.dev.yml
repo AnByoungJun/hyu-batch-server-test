@@ -1,0 +1,11 @@
+# dev override. 비밀값은 같은 디렉터리의 .env.dev 에서 주입.
+# image: 배포 서버가 dev 레지스트리를 부르는 주소와 일치시킬 것
+#   - Jenkins/레지스트리/배포서버가 같은 호스트면 localhost:5000
+#   - 다른 호스트면 레지스트리 호스트 주소(예: 192.168.0.90:5000)로 교체
+services:
+  hyu-batch:
+    image: 192.168.0.90:5000/hyu-batch-server-test:latest
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    env_file:
+      - .env.dev

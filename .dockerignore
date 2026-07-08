@@ -1,0 +1,14 @@
+# 런타임 이미지는 build/libs/*.jar 만 필요. 나머지는 빌드 컨텍스트에서 제외.
+.git
+.gradle
+.idea
+src
+gradle
+gradlew
+gradlew.bat
+*.md
+build/classes
+build/resources
+build/tmp
+build/reports
+build/generated

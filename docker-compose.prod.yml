@@ -1,0 +1,9 @@
+# prod override. 비밀값은 같은 디렉터리의 .env.prod 에서 주입.
+# image: 배포 서버가 운영 레지스트리를 부르는 주소와 일치시킬 것
+services:
+  hyu-batch:
+    image: localhost:5000/hyu-batch-server-test:latest
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    env_file:
+      - .env.prod

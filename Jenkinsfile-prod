@@ -1,0 +1,79 @@
+// 운영(prod) 전용 파이프라인. 운영망 내부의 운영 Jenkins 가 이 파일을 사용한다 (Script Path: Jenkinsfile-prod).
+//   Checkout → Gradle bootJar → 이미지 빌드/push(운영 레지스트리) → SSH 로 운영 서버에 compose 배포
+// 운영은 격리 환경이므로 이 파이프라인은 운영망 안에서만 실행된다(외부 인바운드 없음).
+// 통제된 배포를 위해 자동 트리거 대신 수동 Build(릴리스 시점) 권장.
+pipeline {
+    agent any
+
+    environment {
+        REGISTRY    = 'localhost:5000'                 // 운영 레지스트리 (운영망 로컬)
+        IMAGE       = "${REGISTRY}/hyu-batch-server-test"
+        DEPLOY_HOST = '<PROD_DEPLOY_HOST>'             // TODO: 운영 배포 서버 주소로 교체
+        DEPLOY_PORT = '10022'
+        DEPLOY_CRED = 'prod-hyu'                        // Jenkins 자격증명 ID (SSH, Username with password)
+        COMPOSE     = 'docker/hyu-batch/docker-compose.yml -f docker/hyu-batch/docker-compose.prod.yml'
+    }
+
+    stages {
+        stage('Guard') {
+            steps {
+                script {
+                    // 운영 배포 서버가 아직 설정되지 않았으면 명확히 중단 (엉뚱한 host 로 SSH 방지)
+                    if (env.DEPLOY_HOST.startsWith('<')) {
+                        error "운영 배포 서버(<PROD_DEPLOY_HOST>)가 아직 설정되지 않았습니다. Jenkinsfile-prod 의 DEPLOY_HOST 를 실제 주소로 채우세요."
+                    }
+                }
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build (Gradle)') {
+            steps {
+                bat 'gradlew.bat clean bootJar -x test'
+            }
+        }
+
+        stage('Build & Push image') {
+            steps {
+                // latest + 빌드번호 태그 동시 push (운영 롤백 대비)
+                // --provenance=false: 사설 레지스트리에서 OCI 인덱스 대신 단일 매니페스트로 push (공유-매니페스트 삭제 문제 방지)
+                bat "docker build --provenance=false -t ${IMAGE}:latest -t ${IMAGE}:${env.BUILD_NUMBER} ."
+                bat "docker push ${IMAGE}:latest"
+                bat "docker push ${IMAGE}:${env.BUILD_NUMBER}"
+            }
+        }
+
+        stage('Deploy (prod)') {
+            steps {
+                withCredentials([usernamePassword(
+                        credentialsId: env.DEPLOY_CRED,
+                        usernameVariable: 'SSH_USER',
+                        passwordVariable: 'SSH_PASS')]) {
+                    script {
+                        def remote = [:]
+                        remote.name          = 'prod'
+                        remote.host          = env.DEPLOY_HOST
+                        remote.port          = env.DEPLOY_PORT.toInteger()
+                        remote.user          = env.SSH_USER
+                        remote.password      = env.SSH_PASS
+                        remote.allowAnyHosts = true
+
+                        sshCommand remote: remote, command: "docker compose -f ${env.COMPOSE} pull"
+                        sshCommand remote: remote, command: "docker compose -f ${env.COMPOSE} up -d"
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            bat 'docker image prune -f'
+        }
+    }
+}

@@ -1,0 +1,15 @@
+# ===== 개발(dev) 프로파일 =====
+# 사내 dev DB. 로컬 개발 편의를 위해 기본값을 둔다. (환경변수로 override 가능)
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://192.168.0.81:5432/dev}
+    username: ${DB_USERNAME:dev_admin}
+    password: ${DB_PASSWORD:dev_admin}
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: ${DB_POOL_MAX:5}
+
+logging:
+  level:
+    com.sph.hyu.batch: DEBUG
+    org.hibernate.SQL: DEBUG

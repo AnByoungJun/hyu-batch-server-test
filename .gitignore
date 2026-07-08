@@ -1,0 +1,35 @@
+HELP.md
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+
+### Eclipse / STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+
+### VS Code ###
+.vscode/
+
+### Claude Code (로컬 툴링 설정) ###
+.claude/
+
+### Local config (민감정보) ###
+application-local.yml
+application-local.properties
+# 실제 비밀값 파일은 제외, *.example 템플릿만 커밋
+.env
+.env.*
+!.env.*.example
