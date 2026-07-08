@@ -21,7 +21,7 @@ pipeline {
 
         stage('Build (Gradle)') {
             steps {
-                bat 'gradlew.bat clean bootJar -x test'
+                sh './gradlew clean bootJar -x test'
             }
         }
 
@@ -29,9 +29,9 @@ pipeline {
             steps {
                 // latest + 빌드번호 태그 동시 push (롤백 대비)
                 // --provenance=false: 사설 레지스트리에서 OCI 인덱스 대신 단일 매니페스트로 push (공유-매니페스트 삭제 문제 방지)
-                bat "docker build --provenance=false -t ${IMAGE}:latest -t ${IMAGE}:${env.BUILD_NUMBER} ."
-                bat "docker push ${IMAGE}:latest"
-                bat "docker push ${IMAGE}:${env.BUILD_NUMBER}"
+                sh "docker build --provenance=false -t ${IMAGE}:latest -t ${IMAGE}:${env.BUILD_NUMBER} ."
+                sh "docker push ${IMAGE}:latest"
+                sh "docker push ${IMAGE}:${env.BUILD_NUMBER}"
             }
         }
 
@@ -60,7 +60,7 @@ pipeline {
 
     post {
         always {
-            bat 'docker image prune -f'
+            sh 'docker image prune -f'
         }
     }
 }
