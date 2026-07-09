@@ -26,6 +26,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")   // 헬스체크(/batch/actuator/health)
 
     // DB - PostgreSQL + PostGIS (Hibernate 6 spatial 내장, spatial 타입 지원용)
     runtimeOnly("org.postgresql:postgresql")

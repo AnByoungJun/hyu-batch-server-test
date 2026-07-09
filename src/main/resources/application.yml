@@ -40,6 +40,18 @@ api:
   productivity:
     url: ${PRODUCTIVITY_API_URL:}
 
+# Actuator: 헬스체크만 노출 (경로: {context-path}/actuator/health = /batch/actuator/health)
+#   - status 는 항상 반환(UP/DOWN), 세부 항목(db 등)은 인증된 경우에만 노출
+#   - DB 연결 끊기면 status=DOWN(HTTP 503) → docker healthcheck 가 unhealthy 로 표시
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: when-authorized
+
 logging:
   level:
     com.sph.hyu.batch: INFO

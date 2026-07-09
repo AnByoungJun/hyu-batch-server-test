@@ -5,9 +5,11 @@
 #   - 비밀:    DB_USERNAME/DB_PASSWORD 등 (compose env_file / -e / Secret)
 FROM eclipse-temurin:21-jre
 
-# Timezone (Asia/Seoul)
+# Timezone (Asia/Seoul) + healthcheck 용 curl 설치
 ENV TZ=Asia/Seoul
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
+    && apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY build/libs/*.jar /app/app.jar
