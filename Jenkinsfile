@@ -9,7 +9,7 @@ pipeline {
         DEPLOY_HOST = '192.168.0.90'                    // dev 배포 서버
         DEPLOY_PORT = '22'
         DEPLOY_CRED = 'hyu-dev-ssh'                     // Jenkins 자격증명 ID (Username with password: hyu/hyu)
-        DEPLOY_DIR  = '/home/hyu/hyu-batch-test'             // dev 서버의 배포 디렉터리 (.env.dev 가 여기에 있어야 함)
+        DEPLOY_DIR  = '/home/hyu/app/hyu-batch-test'             // dev 서버의 배포 디렉터리 (.env.dev 가 여기에 있어야 함)
         COMPOSE_ARGS = '-f docker-compose.yml -f docker-compose.dev.yml'
     }
 
