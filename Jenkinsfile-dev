@@ -1,4 +1,4 @@
-// 개발(dev) 전용 파이프라인. 개발 Jenkins 가 이 파일을 사용한다 (Script Path: Jenkinsfile).
+// 개발(dev) 전용 파이프라인. 개발 Jenkins 가 이 파일을 사용한다 (Script Path: Jenkinsfile-dev).
 //   Checkout → Gradle bootJar → 이미지 빌드/push(dev 레지스트리) → SSH 로 dev 서버에 compose 배포
 pipeline {
     agent any
