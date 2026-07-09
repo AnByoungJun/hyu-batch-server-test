@@ -11,7 +11,8 @@ pipeline {
         DEPLOY_HOST = '<PROD_DEPLOY_HOST>'             // TODO: 운영 배포 서버 주소로 교체
         DEPLOY_PORT = '10022'
         DEPLOY_CRED = 'prod-hyu'                        // Jenkins 자격증명 ID (SSH, Username with password)
-        COMPOSE     = 'docker/hyu-batch/docker-compose.yml -f docker/hyu-batch/docker-compose.prod.yml'
+        DEPLOY_DIR  = '/home/hyu/hyu-batch'             // TODO: 운영 배포 서버의 배포 디렉터리 (.env.prod 가 여기에 있어야 함)
+        COMPOSE_ARGS = '-f docker-compose.yml -f docker-compose.prod.yml'
     }
 
     stages {
@@ -63,8 +64,13 @@ pipeline {
                         remote.password      = env.SSH_PASS
                         remote.allowAnyHosts = true
 
-                        sshCommand remote: remote, command: "docker compose -f ${env.COMPOSE} pull"
-                        sshCommand remote: remote, command: "docker compose -f ${env.COMPOSE} up -d"
+                        // 배포 디렉터리 준비 후 compose 파일 전송 (.env.prod 는 서버에 이미 있어야 함 — 비밀값이라 git 미포함)
+                        sshCommand remote: remote, command: "mkdir -p ${env.DEPLOY_DIR}"
+                        sshPut remote: remote, from: 'docker-compose.yml',      into: "${env.DEPLOY_DIR}/docker-compose.yml"
+                        sshPut remote: remote, from: 'docker-compose.prod.yml', into: "${env.DEPLOY_DIR}/docker-compose.prod.yml"
+
+                        sshCommand remote: remote, command: "cd ${env.DEPLOY_DIR} && docker compose ${env.COMPOSE_ARGS} pull"
+                        sshCommand remote: remote, command: "cd ${env.DEPLOY_DIR} && docker compose ${env.COMPOSE_ARGS} up -d"
                     }
                 }
             }
