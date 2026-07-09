@@ -4,8 +4,8 @@ pipeline {
     agent any
 
     triggers {
-        // develop 브랜치에 push 되면 3분 주기 폴링으로 감지해 자동 빌드/배포 (dev Jenkins 가 사내망이라 webhook 대신 Poll SCM 사용)
-        pollSCM('H/3 * * * *')
+        // develop 브랜치에 push 되면 1시간 주기 폴링으로 감지해 자동 빌드/배포 (dev Jenkins 가 사내망이라 webhook 대신 Poll SCM 사용)
+        pollSCM('H * * * *')
     }
 
     environment {
