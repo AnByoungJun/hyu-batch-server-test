@@ -7,7 +7,7 @@ pipeline {
         REGISTRY    = '192.168.0.90:5000'              // dev 레지스트리 (dev 서버와 동일 호스트)
         IMAGE       = "${REGISTRY}/hyu-batch-server-test"
         DEPLOY_HOST = '192.168.0.90'                    // dev 배포 서버
-        DEPLOY_PORT = '10022'
+        DEPLOY_PORT = '22'
         DEPLOY_CRED = 'dev-hyu'                         // Jenkins 자격증명 ID (SSH, Username with password)
         COMPOSE     = 'docker/hyu-batch/docker-compose.yml -f docker/hyu-batch/docker-compose.dev.yml'
     }
